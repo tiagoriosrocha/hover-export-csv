@@ -1,16 +1,76 @@
 # HoVer pronto para grafos
 
-O projeto exporta claims HoVer e suas evidências no esquema CSV do FEVEROUS.
-As anotações HoVer guardam título e índice de sentença; o texto é resolvido no
+Este projeto converte o dataset [HoVer](https://hover-nlp.github.io/) em CSVs
+para experimentos de grafos. O HoVer fornece a claim, o rótulo e as referências
+das sentenças de evidência; este projeto resolve o texto dessas sentenças no
 corpus Wikipedia oficial processado pelo HotpotQA.
 
+## Pré-requisitos
+
+- Python 3.10 ou superior;
+- acesso à internet no primeiro uso;
+- espaço livre suficiente para baixar e extrair o corpus HotpotQA. O download
+  tem aproximadamente 7,4 GB e a extração exige espaço adicional.
+
+O pipeline usa somente a biblioteca padrão do Python, portanto não há pacotes
+extras para instalar.
+
+## Como executar
+
+No macOS ou Linux:
+
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 .venv/bin/python run.py
 ```
 
-No Windows, execute `.venv\\Scripts\\python.exe run.py`.
+No Windows (PowerShell):
 
-No primeiro uso, `run.py` baixa as anotações HoVer e o corpus HotpotQA (~7,4
-GB), extrai o corpus e gera `processed-data/train.csv`,
-`processed-data/dev.csv` e `processed-data/hover_dataset_full.csv`.
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe run.py
+```
+
+O `run.py` é multiplataforma e faz o fluxo completo:
+
+1. baixa os splits oficiais de treino, desenvolvimento e teste do HoVer quando
+   estiverem ausentes;
+2. baixa e extrai o corpus Wikipedia processado pelo HotpotQA quando necessário;
+3. executa `export_graph_ready_csv.py`.
+
+Os arquivos baixados ficam em `data/`, que é ignorada pelo Git. Em execuções
+seguintes, arquivos já existentes são reutilizados.
+
+## Saídas
+
+Após a exportação, `processed-data/` contém:
+
+```text
+processed-data/
+├── train.csv
+├── dev.csv
+└── hover_dataset_full.csv
+```
+
+O split de teste do HoVer contém somente claims, sem rótulos ou evidências;
+por isso não participa dos CSVs prontos para grafos.
+
+Cada linha dos CSVs exportados tem as colunas:
+
+```text
+id,label,split,claim,evidence_text,evidence,evidence_annotation_id,
+evidence_id,evidence_wiki_url,evidence_sentence_id
+```
+
+Os campos de evidência são JSON válido dentro da célula CSV. `evidence_text`
+usa o formato `[{"set_id": 0, "text": ["sentença 1", "sentença 2"]}]`.
+As sentenças correspondem aos fatos de suporte anotados no HoVer.
+
+## Arquivos do projeto
+
+- `run.py`: download, verificação e execução do pipeline;
+- `export_graph_ready_csv.py`: conversão das anotações e resolução das
+  evidências;
+- `requirements.txt`: intencionalmente sem dependências externas;
+- `.gitignore`: impede que o corpus baixado e os CSVs gerados sejam enviados ao
+  Git.
