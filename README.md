@@ -66,6 +66,11 @@ Os campos de evidência são JSON válido dentro da célula CSV. `evidence_text`
 usa o formato `[{"set_id": 0, "text": ["sentença 1", "sentença 2"]}]`.
 As sentenças correspondem aos fatos de suporte anotados no HoVer.
 
+Algumas anotações apontam para uma posição inexistente no snapshot do corpus
+HotpotQA. Esses exemplos não são incluídos nos CSVs para não associar uma
+evidência incorreta ao claim; o arquivo `unresolved_evidence.csv` registra os
+casos e os índices que não puderam ser resolvidos.
+
 ## Arquivos do projeto
 
 - `run.py`: download, verificação e execução do pipeline;
