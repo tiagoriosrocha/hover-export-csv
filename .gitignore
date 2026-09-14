@@ -5,5 +5,5 @@ __pycache__/
 .idea/
 .vscode/
 data/
-processed-data/*.csv
+#processed-data/*.csv
 *.part
